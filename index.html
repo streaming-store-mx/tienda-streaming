@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Streaming Store</title>
+    <!-- Etiquetas anti-caché para forzar actualización inmediata -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -110,6 +115,406 @@
             </div>
         </div>
     </nav>
+
+    <!-- Botón Flotante Carrito (Inferior Derecha) -->
+    <button type="button" onclick="openCartModal()" class="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition flex items-center justify-center glow-card">
+        <i class="fa-solid fa-cart-shopping text-xl"></i>
+        <span id="cart-badge-float" class="absolute -top-1 -right-1 bg-emerald-500 text-slate-950 text-xs w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-slate-950 shadow-md hidden">0</span>
+    </button>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
+        <section id="tab-shop" class="space-y-6">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 👋</h2>
+                <p class="text-xs text-slate-400">Tu ID único de recarga es: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
+            </div>
+
+            <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-sm px-5 py-3 rounded-2xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
+                <i class="fa-solid fa-wallet"></i> Recargar Saldo
+            </button>
+
+            <!-- Catálogo de productos -->
+            <div class="grid grid-cols-1 gap-6" id="products-grid"></div>
+
+            <!-- Panel Cliente: Mis Cuentas Compradas -->
+            <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
+                    <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950 text-slate-400">
+                            <tr>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">Credenciales</th>
+                                <th class="p-3">Precio</th>
+                                <th class="p-3">Fecha Compra</th>
+                                <th class="p-3">Vencimiento / Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchases-list" class="divide-y divide-purple-950/50">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel Admin -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30 shadow-xl">
+                <h2 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Panel Administrador
+                </h2>
+                <button type="button" onclick="switchTab('shop')" class="text-sm bg-purple-600 hover:bg-purple-500 font-bold px-4 py-2 rounded-xl transition">
+                    <i class="fa-solid fa-store"></i> Volver a Tienda
+                </button>
+            </div>
+
+            <!-- Contadores de Ventas, Dinero y Botón de Reinicio -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-900/80 border border-emerald-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+                    <div class="space-y-1">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Cuentas Vendidas</p>
+                        <h3 id="admin-total-sold-count" class="text-3xl font-black text-emerald-400">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 text-2xl">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-pink-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+                    <div class="space-y-1">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Recaudado</p>
+                        <h3 id="admin-total-money" class="text-3xl font-black text-pink-400">$0.00 MXN</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400 text-2xl">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-red-500/40 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Reiniciar Contador</p>
+                    <button type="button" onclick="resetSalesStats()" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-red-600/20">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Estadísticas
+                    </button>
+                </div>
+            </div>
+
+            <!-- HISTORIAL GENERAL DE CUENTAS DE CLIENTES Y VENCIMIENTOS -->
+            <div class="bg-slate-900/80 border border-purple-500/40 p-6 rounded-2xl space-y-4 shadow-2xl">
+                <h3 class="text-lg font-bold text-pink-400 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Historial General y Vencimientos de Cuentas
+                </h3>
+                <div class="overflow-x-auto max-h-[400px]">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950 text-slate-400 sticky top-0 z-10">
+                            <tr>
+                                <th class="p-3">Cliente / ID</th>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">Credenciales</th>
+                                <th class="p-3">Precio</th>
+                                <th class="p-3">Compra</th>
+                                <th class="p-3">Vencimiento / Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-all-purchases-list" class="divide-y divide-purple-950/50">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">No hay cuentas vendidas aún.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Datos Bancarios -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-building-columns"></i> Datos Bancarios
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Banco</label>
+                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA / Banco Azteca" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">CLABE</label>
+                            <input type="text" id="admin-bank-clabe" placeholder="12345678..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Titular</label>
+                            <input type="text" id="admin-bank-holder" placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Banco</button>
+                    </div>
+                </div>
+
+                <!-- Recargar por ID en Firebase -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Recargar por ID
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
+                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Monto MXN</label>
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito</button>
+                    </div>
+                </div>
+
+                <!-- Modificar Precios -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-tags"></i> Precios
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Producto</label>
+                            <select id="price-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Nuevo Precio</label>
+                            <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar Precio</button>
+                    </div>
+                </div>
+
+                <!-- Modificar Nombre, Imagen y Duración Dinámica de Tarjetas -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar Producto (Nombre, Duración, Imagen)
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Seleccionar Producto</label>
+                            <select id="image-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white" onchange="loadProductDetailsToForm()"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Nombre del Producto</label>
+                            <input type="text" id="edit-prod-name" placeholder="Ej. Netflix Premium" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Duración (Días)</label>
+                            <input type="number" id="edit-prod-duration" placeholder="30" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">URL de la Imagen</label>
+                            <input type="text" id="edit-prod-image" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateProductDetails()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Cambios del Producto</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+
+    <!-- Botón Flotante Carrito (Inferior Derecha) -->
+    <button type="button" onclick="openCartModal()" class="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition flex items-center justify-center glow-card">
+        <i class="fa-solid fa-cart-shopping text-xl"></i>
+        <span id="cart-badge-float" class="absolute -top-1 -right-1 bg-emerald-500 text-slate-950 text-xs w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-slate-950 shadow-md hidden">0</span>
+    </button>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
+        <section id="tab-shop" class="space-y-6">
+            <div class="space-y-1">
+                <h2 class="text-2xl font-bold text-white tracking-wide">Hola, <span id="welcome-username" class="text-pink-400">Cliente</span> 👋</h2>
+                <p class="text-xs text-slate-400">Tu ID único de recarga es: <strong id="user-id-banner" class="text-purple-300 font-mono">CLI-0000</strong></p>
+            </div>
+
+            <button type="button" onclick="openTopUpModal()" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 text-white text-sm px-5 py-3 rounded-2xl font-bold transition flex items-center gap-2 shadow-lg shadow-purple-600/30">
+                <i class="fa-solid fa-wallet"></i> Recargar Saldo
+            </button>
+
+            <!-- Catálogo de productos -->
+            <div class="grid grid-cols-1 gap-6" id="products-grid"></div>
+
+            <!-- Panel Cliente: Mis Cuentas Compradas -->
+            <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
+                <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
+                    <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950 text-slate-400">
+                            <tr>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">Credenciales</th>
+                                <th class="p-3">Precio</th>
+                                <th class="p-3">Fecha Compra</th>
+                                <th class="p-3">Vencimiento / Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchases-list" class="divide-y divide-purple-950/50">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Panel Admin -->
+        <section id="tab-admin" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30 shadow-xl">
+                <h2 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Panel Administrador
+                </h2>
+                <button type="button" onclick="switchTab('shop')" class="text-sm bg-purple-600 hover:bg-purple-500 font-bold px-4 py-2 rounded-xl transition">
+                    <i class="fa-solid fa-store"></i> Volver a Tienda
+                </button>
+            </div>
+
+            <!-- Contadores de Ventas, Dinero y Botón de Reinicio -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-900/80 border border-emerald-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+                    <div class="space-y-1">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Cuentas Vendidas</p>
+                        <h3 id="admin-total-sold-count" class="text-3xl font-black text-emerald-400">0</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 text-2xl">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-pink-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
+                    <div class="space-y-1">
+                        <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Recaudado</p>
+                        <h3 id="admin-total-money" class="text-3xl font-black text-pink-400">$0.00 MXN</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400 text-2xl">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 border border-red-500/40 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
+                    <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Reiniciar Contador</p>
+                    <button type="button" onclick="resetSalesStats()" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-red-600/20">
+                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Estadísticas
+                    </button>
+                </div>
+            </div>
+
+            <!-- HISTORIAL GENERAL DE CUENTAS DE CLIENTES Y VENCIMIENTOS -->
+            <div class="bg-slate-900/80 border border-purple-500/40 p-6 rounded-2xl space-y-4 shadow-2xl">
+                <h3 class="text-lg font-bold text-pink-400 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Historial General y Vencimientos de Cuentas
+                </h3>
+                <div class="overflow-x-auto max-h-[400px]">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950 text-slate-400 sticky top-0 z-10">
+                            <tr>
+                                <th class="p-3">Cliente / ID</th>
+                                <th class="p-3">Servicio</th>
+                                <th class="p-3">Credenciales</th>
+                                <th class="p-3">Precio</th>
+                                <th class="p-3">Compra</th>
+                                <th class="p-3">Vencimiento / Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-all-purchases-list" class="divide-y divide-purple-950/50">
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">No hay cuentas vendidas aún.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Datos Bancarios -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
+                        <i class="fa-solid fa-building-columns"></i> Datos Bancarios
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Banco</label>
+                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA / Banco Azteca" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">CLABE</label>
+                            <input type="text" id="admin-bank-clabe" placeholder="12345678..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Titular</label>
+                            <input type="text" id="admin-bank-holder" placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Banco</button>
+                    </div>
+                </div>
+
+                <!-- Recargar por ID en Firebase -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Recargar por ID
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
+                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Monto MXN</label>
+                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito</button>
+                    </div>
+                </div>
+
+                <!-- Modificar Precios -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-tags"></i> Precios
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Producto</label>
+                            <select id="price-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Nuevo Precio</label>
+                            <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar Precio</button>
+                    </div>
+                </div>
+
+                <!-- Modificar Nombre, Imagen y Duración Dinámica de Tarjetas -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar Producto (Nombre, Duración, Imagen)
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Seleccionar Producto</label>
+                            <select id="image-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white" onchange="loadProductDetailsToForm()"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Nombre del Producto</label>
+                            <input type="text" id="edit-prod-name" placeholder="Ej. Netflix Premium" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Duración (Días)</label>
+                            <input type="number" id="edit-prod-duration" placeholder="30" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">URL de la Imagen</label>
+                            <input type="text" id="edit-prod-image" placeholder="https://..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="updateProductDetails()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Cambios del Producto</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
 
     <!-- Botón Flotante Carrito (Inferior Derecha) -->
     <button type="button" onclick="openCartModal()" class="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition flex items-center justify-center glow-card">
