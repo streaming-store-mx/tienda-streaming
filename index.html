@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Streaming Store</title>
-    <!-- Control anti-caché para forzar actualización inmediata en clientes -->
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Last-Modified" content="0">
-    <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+    <!-- Etiquetas anti-caché añadidas para forzar actualización inmediata en los clientes -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -173,7 +172,7 @@
                 </button>
             </div>
 
-            <!-- Contadores de Ventas, Dinero y Botón de Reinicio -->
+            <!-- Contadores de Ventas, Dinero y Botón de Reinicio 🫰 -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900/80 border border-emerald-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
                     <div class="space-y-1">
@@ -314,11 +313,5 @@
             </div>
         </section>
     </main>
-
-    <!-- Script principal con control de recarga anticaché -->
-    <script>
-        // Este script detecta si la página fue actualizada y fuerza la limpieza local si es necesario
-        console.log("Streaming Store con control anti-caché activo.");
-    </script>
 </body>
 </html>
