@@ -133,10 +133,10 @@
             <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 gap-6" id="products-grid"></div>
 
-            <!-- Panel Cliente: Mis Cuentas Compradas -->
+            <!-- Panel Cliente: Mis Cuentas Compradas con Recordatorio de Vencimiento -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
-                    <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas
+                    <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas y Vencimientos
                 </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
@@ -146,7 +146,7 @@
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
                                 <th class="p-3">Fecha Compra</th>
-                                <th class="p-3">Vencimiento / Acciones</th>
+                                <th class="p-3">Estado / Vencimiento</th>
                             </tr>
                         </thead>
                         <tbody id="purchases-list" class="divide-y divide-purple-950/50">
@@ -190,7 +190,7 @@
 
             <!-- Historial General -->
             <div class="bg-slate-900/80 border border-purple-500/40 p-6 rounded-2xl space-y-4 shadow-2xl">
-                <h3 class="text-lg font-bold text-pink-400">Historial General de Ventas</h3>
+                <h3 class="text-lg font-bold text-pink-400">Historial General de Ventas y Vencimientos</h3>
                 <div class="overflow-x-auto max-h-[400px]">
                     <table class="w-full text-left text-sm">
                         <thead class="bg-slate-950 text-slate-400 sticky top-0">
@@ -200,7 +200,7 @@
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
                                 <th class="p-3">Compra</th>
-                                <th class="p-3">Vencimiento</th>
+                                <th class="p-3">Estado / Vencimiento</th>
                             </tr>
                         </thead>
                         <tbody id="admin-all-purchases-list" class="divide-y divide-purple-950/50">
@@ -277,7 +277,7 @@
         </section>
     </main>
 
-    <!-- Modales Carrito, Admin PIN, Recarga -->
+    <!-- Modales Carrito, Admin PIN -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-500/40 rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-2xl flex flex-col justify-between max-h-[85vh]">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
@@ -309,6 +309,7 @@
         </div>
     </div>
 
+    <!-- Modal Recarga con Botón de Copiar Datos Bancarios e ID -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 class="text-xl font-bold text-pink-400">Recargar Saldo</h3>
@@ -318,10 +319,23 @@
                     <p>CLABE: <span id="bank-clabe-display" class="text-white font-bold">1234567890</span></p>
                     <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Admin</span></p>
                 </div>
-                <p>Tu ID: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-0000</strong></p>
-                <a href="https://wa.me/529241955327?text=Hola,%20mi%20ID%20es:%20" target="_blank" id="whatsapp-support-link" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm">Enviar Comprobante</a>
+                <p>Tu ID de Cliente: <strong id="topup-user-id" class="text-pink-400 font-mono text-sm">CLI-0000</strong></p>
+                
+                <!-- Botón para Copiar la Información de Recarga -->
+                <button type="button" onclick="copyBankInfoAndID()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition text-xs shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-copy"></i> Copiar Datos de Recarga e ID
+                </button>
+
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Sube tu comprobante de pago (Captura):</label>
+                    <input type="file" id="payment-receipt-file" accept="image/*" class="w-full bg-slate-950 border border-purple-900/40 rounded-xl p-2 text-xs text-slate-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500">
+                </div>
+
+                <button type="button" onclick="sendProofViaWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm shadow-lg shadow-emerald-600/30 transition">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante por WhatsApp
+                </button>
             </div>
-            <button type="button" onclick="closeTopUpModal()" class="w-full bg-slate-800 py-2 rounded-xl text-xs text-slate-300">Cerrar</button>
+            <button type="button" onclick="closeTopUpModal()" class="w-full bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl text-xs text-slate-300 font-bold transition">Cerrar</button>
         </div>
     </div>
 
@@ -368,6 +382,10 @@
                 document.getElementById('bank-name-display').innerText = bank.name || 'BBVA';
                 document.getElementById('bank-clabe-display').innerText = bank.clabe || '1234567890';
                 document.getElementById('bank-holder-display').innerText = bank.holder || 'Admin';
+            });
+
+            database.ref('clients').on('value', () => {
+                loadGlobalSalesStats();
             });
         }
 
@@ -558,6 +576,13 @@
             });
         }
 
+        function copyAccountCredentials(elementId) {
+            const el = document.getElementById(elementId);
+            if(el) {
+                navigator.clipboard.writeText(el.innerText).then(() => alert('¡Credenciales copiadas!'));
+            }
+        }
+
         function handleLogin(e) {
             e.preventDefault();
             const user = document.getElementById('login-username').value.trim();
@@ -583,9 +608,52 @@
         function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
         function verifyAdminPIN() { if(document.getElementById('admin-pin-input').value.length > 0) { closeAdminModal(); document.getElementById('tab-shop').classList.add('hidden'); document.getElementById('tab-admin').classList.remove('hidden'); } else { alert('PIN Incorrecto'); } }
         function switchTab(tab) { if(tab === 'shop') { document.getElementById('tab-admin').classList.add('hidden'); document.getElementById('tab-shop').classList.remove('hidden'); } }
-        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        
+        function openTopUpModal() { 
+            const currentClientID = localStorage.getItem('currentClientID') || 'CLI-0000';
+            document.getElementById('topup-user-id').innerText = currentClientID;
+            document.getElementById('payment-receipt-file').value = '';
+            document.getElementById('topup-modal').classList.remove('hidden'); 
+        }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
-        function copyClientID() { navigator.clipboard.writeText(localStorage.getItem('currentClientID')); alert('ID copiado'); }
+
+        // Copiar información completa de recarga y ID
+        function copyBankInfoAndID() {
+            const bank = document.getElementById('bank-name-display').innerText;
+            const clabe = document.getElementById('bank-clabe-display').innerText;
+            const holder = document.getElementById('bank-holder-display').innerText;
+            const currentClientID = localStorage.getItem('currentClientID') || 'CLI-0000';
+
+            const infoText = `Datos de Recarga:\nBanco: ${bank}\nCLABE: ${clabe}\nTitular: ${holder}\nMi ID de Cliente: ${currentClientID}`;
+            
+            navigator.clipboard.writeText(infoText).then(() => {
+                alert('¡Información de recarga y tu ID copiados al portapapeles!');
+            });
+        }
+
+        function sendProofViaWhatsApp() {
+            const currentClientID = localStorage.getItem('currentClientID') || 'CLI-0000';
+            const fileInput = document.getElementById('payment-receipt-file');
+            
+            let message = `Hola, acabo de realizar una recarga. Mi ID de cliente es: *${currentClientID}*. Adjunto mi comprobante de pago.`;
+            
+            if (fileInput.files && fileInput.files[0]) {
+                alert('¡Comprobante listo! Se abrirá WhatsApp para que envíes la captura junto con tu ID.');
+            } else {
+                if (!confirm('No has seleccionado ninguna imagen de comprobante. ¿Deseas enviar el mensaje de todas formas?')) {
+                    return;
+                }
+            }
+
+            const encodedMsg = encodeURIComponent(message);
+            window.open(`https://wa.me/529241955327?text=${encodedMsg}`, '_blank');
+        }
+        
+        function copyClientID() { 
+            const cid = localStorage.getItem('currentClientID') || 'CLI-0000';
+            navigator.clipboard.writeText(cid); 
+            alert('ID copiado: ' + cid); 
+        }
 
         function addStock() {
             const prodId = document.getElementById('stock-product-id').value;
@@ -611,6 +679,73 @@
             });
         }
 
+        function loadGlobalSalesStats() {
+            database.ref('clients').on('value', (snapshot) => {
+                let totalSoldCount = 0;
+                let totalMoneyEarned = 0;
+                let allPurchasesHTML = '';
+                const clientsData = snapshot.val() || {};
+                const todayStr = new Date().toISOString().split('T')[0];
+
+                Object.entries(clientsData).forEach(([clientId, client]) => {
+                    if (client.purchases) {
+                        Object.entries(client.purchases).forEach(([pId, purchase]) => {
+                            totalSoldCount += 1;
+                            totalMoneyEarned += parseFloat(purchase.price || 0);
+
+                            const expireDate = purchase.expireDate || '';
+                            let badgeStyle = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                            let statusText = `Vence: ${expireDate}`;
+
+                            if (expireDate) {
+                                const today = new Date(todayStr);
+                                const exp = new Date(expireDate);
+                                const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+
+                                if (diffDays < 0) {
+                                    badgeStyle = 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse';
+                                    statusText = `¡VENCIDA! (${expireDate})`;
+                                } else if (diffDays <= 3) {
+                                    badgeStyle = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                                    statusText = `Por vencer (${expireDate})`;
+                                }
+                            }
+
+                            const clientDisplayName = purchase.clientName || client.username || 'Cliente';
+
+                            allPurchasesHTML += `
+                                <tr class="hover:bg-purple-950/20 transition">
+                                    <td class="p-3">
+                                        <div class="font-bold text-white">${clientDisplayName}</div>
+                                        <div class="text-xs text-pink-400 font-mono">${purchase.clientId || clientId}</div>
+                                    </td>
+                                    <td class="p-3 font-bold text-white">${purchase.productName}</td>
+                                    <td class="p-3 font-mono text-cyan-400 select-all">${purchase.credentials}</td>
+                                    <td class="p-3 text-emerald-400 font-bold">$${purchase.price} MXN</td>
+                                    <td class="p-3 text-slate-300 text-xs">${purchase.purchaseDate}</td>
+                                    <td class="p-3 text-xs">
+                                        <span class="px-2.5 py-1 rounded-lg border font-bold inline-block ${badgeStyle}">
+                                            ${statusText}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                });
+
+                const countEl = document.getElementById('admin-total-sold-count');
+                const moneyEl = document.getElementById('admin-total-money');
+                const historyEl = document.getElementById('admin-all-purchases-list');
+
+                if (countEl) countEl.innerText = totalSoldCount;
+                if (moneyEl) moneyEl.innerText = `$${totalMoneyEarned.toFixed(2)} MXN`;
+                if (historyEl) {
+                    historyEl.innerHTML = allPurchasesHTML || `<tr><td colspan="6" class="p-4 text-center text-slate-500">No hay ventas registradas.</td></tr>`;
+                }
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initRealtimeSync();
             const user = localStorage.getItem('currentUser');
@@ -620,12 +755,56 @@
                 document.getElementById('welcome-username').innerText = user;
                 document.getElementById('user-client-id').innerText = clientId;
                 document.getElementById('user-id-banner').innerText = clientId;
+
                 database.ref('clients/' + clientId).on('value', snap => {
-                    document.getElementById('user-balance').innerText = `$${(snap.val()?.balance || 0).toFixed(2)}`;
+                    const data = snap.val() || {};
+                    document.getElementById('user-balance').innerText = `$${(data.balance || 0).toFixed(2)}`;
                     const pList = document.getElementById('purchases-list');
-                    const purchases = snap.val()?.purchases;
+                    const purchases = data.purchases;
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    
                     if(purchases) {
-                        pList.innerHTML = Object.values(purchases).map(p => `<tr><td class="p-3">${p.productName}</td><td class="p-3 font-mono text-pink-400 select-all">${p.credentials}</td><td class="p-3">$${p.price}</td><td class="p-3">${p.purchaseDate}</td><td class="p-3">${p.expireDate}</td></tr>`).join('');
+                        pList.innerHTML = Object.entries(purchases).map(([pId, p]) => {
+                            const supportText = encodeURIComponent(`Hola, soy ${user} (ID: ${clientId}). Tengo un problema con mi cuenta de ${p.productName} comprada el ${p.purchaseDate}.`);
+                            
+                            const expireDate = p.expireDate || '';
+                            let badgeStyle = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                            let statusText = `Vence: ${expireDate}`;
+
+                            if (expireDate) {
+                                const today = new Date(todayStr);
+                                const exp = new Date(expireDate);
+                                const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+
+                                if (diffDays < 0) {
+                                    badgeStyle = 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse';
+                                    statusText = `¡VENCIDA! (${expireDate})`;
+                                } else if (diffDays <= 3) {
+                                    badgeStyle = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                                    statusText = `Por vencer (${expireDate})`;
+                                }
+                            }
+
+                            return `
+                                <tr class="hover:bg-purple-950/25 transition">
+                                    <td class="p-3 font-bold text-white">${p.productName}</td>
+                                    <td class="p-3 font-mono text-pink-400 select-all" id="creds-${pId}">${p.credentials}</td>
+                                    <td class="p-3 text-emerald-400 font-bold">$${p.price} MXN</td>
+                                    <td class="p-3 text-slate-300 text-xs">${p.purchaseDate}</td>
+                                    <td class="p-3 text-xs space-y-1.5">
+                                        <span class="px-2.5 py-1 rounded-lg border font-bold inline-block ${badgeStyle}">
+                                            ${statusText}
+                                        </span>
+                                        <div class="flex gap-1.5 mt-1">
+                                            <button onclick="copyAccountCredentials('creds-${pId}')" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition">Copiar</button>
+                                            <a href="https://wa.me/529241955327?text=${supportText}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition flex items-center gap-1">Soporte</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    } else {
+                        pList.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>`;
                     }
                 });
             }
