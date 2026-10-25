@@ -64,10 +64,6 @@
 
             <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-4">
                 <div>
-                    <label class="text-xs text-slate-400">Nombre Completo</label>
-                    <input type="text" id="reg-fullname" required placeholder="Juan Pérez" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
-                </div>
-                <div>
                     <label class="text-xs text-slate-400">Nombre de Usuario</label>
                     <input type="text" id="reg-username" required placeholder="juanperez123" class="w-full bg-slate-950/80 border border-purple-900/50 rounded-xl p-3 text-sm mt-1 text-white focus:outline-none focus:border-pink-500 transition">
                 </div>
@@ -116,7 +112,7 @@
         </div>
     </nav>
 
-    <!-- Botón Flotante Carrito (Inferior Derecha) -->
+    <!-- Botón Flotante Carrito -->
     <button type="button" onclick="openCartModal()" class="fixed bottom-6 right-6 z-40 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition flex items-center justify-center glow-card">
         <i class="fa-solid fa-cart-shopping text-xl"></i>
         <span id="cart-badge-float" class="absolute -top-1 -right-1 bg-emerald-500 text-slate-950 text-xs w-6 h-6 rounded-full flex items-center justify-center font-black border-2 border-slate-950 shadow-md hidden">0</span>
@@ -172,196 +168,108 @@
                 </button>
             </div>
 
-            <!-- Contadores de Ventas, Dinero y Botón de Reinicio -->
+            <!-- Contadores de Ventas -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-slate-900/80 border border-emerald-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
                     <div class="space-y-1">
                         <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Cuentas Vendidas</p>
                         <h3 id="admin-total-sold-count" class="text-3xl font-black text-emerald-400">0</h3>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 text-2xl">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                    </div>
                 </div>
-
                 <div class="bg-slate-900/80 border border-pink-500/40 p-5 rounded-2xl shadow-xl flex items-center justify-between">
                     <div class="space-y-1">
                         <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Recaudado</p>
                         <h3 id="admin-total-money" class="text-3xl font-black text-pink-400">$0.00 MXN</h3>
                     </div>
-                    <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center text-pink-400 text-2xl">
-                        <i class="fa-solid fa-money-bill-wave"></i>
-                    </div>
                 </div>
-
                 <div class="bg-slate-900/80 border border-red-500/40 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
                     <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Reiniciar Contador</p>
-                    <button type="button" onclick="resetSalesStats()" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-red-600/20">
-                        <i class="fa-solid fa-rotate-right"></i> Reiniciar Estadísticas
-                    </button>
+                    <button type="button" onclick="resetSalesStats()" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition">Reiniciar</button>
                 </div>
             </div>
 
-            <!-- HISTORIAL GENERAL DE CUENTAS DE CLIENTES Y VENCIMIENTOS -->
+            <!-- Historial General -->
             <div class="bg-slate-900/80 border border-purple-500/40 p-6 rounded-2xl space-y-4 shadow-2xl">
-                <h3 class="text-lg font-bold text-pink-400 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Historial General y Vencimientos de Cuentas
-                </h3>
+                <h3 class="text-lg font-bold text-pink-400">Historial General de Ventas</h3>
                 <div class="overflow-x-auto max-h-[400px]">
                     <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-950 text-slate-400 sticky top-0 z-10">
+                        <thead class="bg-slate-950 text-slate-400 sticky top-0">
                             <tr>
                                 <th class="p-3">Cliente / ID</th>
                                 <th class="p-3">Servicio</th>
                                 <th class="p-3">Credenciales</th>
                                 <th class="p-3">Precio</th>
                                 <th class="p-3">Compra</th>
-                                <th class="p-3">Vencimiento / Estado</th>
+                                <th class="p-3">Vencimiento</th>
                             </tr>
                         </thead>
                         <tbody id="admin-all-purchases-list" class="divide-y divide-purple-950/50">
-                            <tr><td colspan="6" class="p-4 text-center text-slate-500">No hay cuentas vendidas aún.</td></tr>
+                            <tr><td colspan="6" class="p-4 text-center text-slate-500">No hay ventas registradas.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Crear Nuevo Producto / Opción -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-plus-circle"></i> Crear Nuevo Producto
-                    </h3>
+                <!-- Crear Producto -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4">
+                    <h3 class="font-bold text-lg text-emerald-400">Crear Nuevo Producto</h3>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Nombre del Servicio</label>
-                            <input type="text" id="new-prod-name" placeholder="Ej. Paramount+ (1 Mes)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Precio MXN</label>
-                            <input type="number" id="new-prod-price" placeholder="120" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Duración en Días</label>
-                            <input type="number" id="new-prod-days" value="30" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <button type="button" onclick="createNewProduct()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">Agregar Producto</button>
+                        <input type="text" id="new-prod-name" placeholder="Nombre (Ej. Max 1 Mes)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+                        <input type="number" id="new-prod-price" placeholder="Precio MXN" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+                        <input type="number" id="new-prod-days" value="30" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+                        <button type="button" onclick="createNewProduct()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Producto</button>
                     </div>
                 </div>
 
                 <!-- Datos Bancarios -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
-                        <i class="fa-solid fa-building-columns"></i> Datos Bancarios
-                    </h3>
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4">
+                    <h3 class="font-bold text-lg text-blue-400">Datos Bancarios</h3>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Banco</label>
-                            <input type="text" id="admin-bank-name" placeholder="Ej. BBVA / Banco Azteca" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">CLABE</label>
-                            <input type="text" id="admin-bank-clabe" placeholder="12345678..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Titular</label>
-                            <input type="text" id="admin-bank-holder" placeholder="Tu Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
+                        <input type="text" id="admin-bank-name" placeholder="Banco" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+                        <input type="text" id="admin-bank-clabe" placeholder="CLABE" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+                        <input type="text" id="admin-bank-holder" placeholder="Titular" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
                         <button type="button" onclick="updateBankInfo()" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Banco</button>
                     </div>
                 </div>
 
-                <!-- Recargar por ID en Firebase -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Recargar por ID
-                    </h3>
+                <!-- Recargar por ID -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4">
+                    <h3 class="font-bold text-lg text-emerald-400">Recargar por ID</h3>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">ID del Cliente (ej. CLI-849201)</label>
-                            <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white uppercase">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Monto MXN</label>
-                            <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
+                        <input type="text" id="add-credit-client-id" placeholder="CLI-XXXXXX" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white uppercase">
+                        <input type="number" id="add-credit-amount" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
                         <button type="button" onclick="addCreditByClientID()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition">Añadir Crédito</button>
                     </div>
                 </div>
 
                 <!-- Modificar Precios -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-purple-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-amber-400 flex items-center gap-2">
-                        <i class="fa-solid fa-tags"></i> Precios
-                    </h3>
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-purple-900/40 space-y-4">
+                    <h3 class="font-bold text-lg text-amber-400">Modificar Precio</h3>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Producto</label>
-                            <select id="price-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Nuevo Precio</label>
-                            <input type="number" id="new-product-price" placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
+                        <select id="price-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white"></select>
+                        <input type="number" id="new-product-price" placeholder="Nuevo Precio" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
                         <button type="button" onclick="updateProductPrice()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-2.5 rounded-xl text-sm transition">Actualizar Precio</button>
                     </div>
                 </div>
 
-                <!-- Modificar Nombre, Imagen y Duración Dinámica de Tarjetas -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-pink-400 flex items-center gap-2">
-                        <i class="fa-solid fa-pen-to-square"></i> Editar Producto (Nombre, Duración, Imagen)
-                    </h3>
+                <!-- Editar Nombre / Imagen -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-pink-900/40 space-y-4">
+                    <h3 class="font-bold text-lg text-pink-400">Editar Producto (Imagen/Nombre)</h3>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Seleccionar Producto</label>
-                            <select id="image-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white" onchange="loadProductDetailsToForm()"></select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Nuevo Nombre de la Cuenta</label>
-                            <input type="text" id="edit-product-name" placeholder="Ej. Netflix 4K (3 Meses)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Duración en Días (Ej: 30, 90, 180, 365)</label>
-                            <input type="number" id="edit-product-duration-days" placeholder="30" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Imagen de Tarjeta (Galería)</label>
-                            <input type="file" id="edit-product-file" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs mt-1 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pink-600 file:text-white hover:file:bg-pink-500">
-                        </div>
+                        <select id="image-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white" onchange="loadProductDetailsToForm()"></select>
+                        <input type="text" id="edit-product-name" placeholder="Nuevo Nombre" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
+                        <input type="file" id="edit-product-file" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-300">
                         <button type="button" onclick="updateProductVisuals()" class="w-full bg-pink-600 hover:bg-pink-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Cambios</button>
                     </div>
                 </div>
 
-                <!-- Cambiar Fondo de la Tienda -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-cyan-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-cyan-400 flex items-center gap-2">
-                        <i class="fa-solid fa-palette"></i> Cambiar Fondo de la Tienda
-                    </h3>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Seleccionar Imagen de Fondo</label>
-                            <input type="file" id="store-bg-file" accept="image/*" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs mt-1 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500">
-                        </div>
-                        <button type="button" onclick="updateStoreBackground()" class="w-full bg-cyan-600 hover:bg-cyan-500 font-bold py-2.5 rounded-xl text-sm transition">Aplicar Fondo</button>
-                        <button type="button" onclick="resetStoreBackground()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-2 rounded-xl text-xs transition">Restaurar Fondo</button>
-                    </div>
-                </div>
-
                 <!-- Cargar Stock -->
-                <div class="bg-slate-900/60 p-6 rounded-2xl border border-indigo-900/40 space-y-4 shadow-lg">
-                    <h3 class="font-bold text-lg text-indigo-400 flex items-center gap-2">
-                        <i class="fa-solid fa-box-archive"></i> Inventario de Cuentas
-                    </h3>
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-indigo-900/40 space-y-4">
+                    <h3 class="font-bold text-lg text-indigo-400">Inventario de Cuentas</h3>
                     <div class="space-y-3">
-                        <div>
-                            <label class="text-xs text-slate-400">Producto</label>
-                            <select id="stock-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white"></select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400">Credenciales</label>
-                            <input type="text" id="stock-credentials" placeholder="correo : clave" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
-                        </div>
+                        <select id="stock-product-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white"></select>
+                        <input type="text" id="stock-credentials" placeholder="correo : clave" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-white">
                         <button type="button" onclick="addStock()" class="w-full bg-indigo-600 hover:bg-indigo-500 font-bold py-2.5 rounded-xl text-sm transition">Guardar Stock</button>
                     </div>
                 </div>
@@ -369,42 +277,31 @@
         </section>
     </main>
 
-    <!-- Modal del Carrito de Compras -->
+    <!-- Modales Carrito, Admin PIN, Recarga -->
     <div id="cart-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
-        <div class="bg-slate-900 border border-purple-500/40 rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-2xl glow-card max-h-[85vh] flex flex-col justify-between">
+        <div class="bg-slate-900 border border-purple-500/40 rounded-3xl p-6 max-w-lg w-full space-y-5 shadow-2xl flex flex-col justify-between max-h-[85vh]">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
-                <h3 class="text-xl font-bold text-pink-400 flex items-center gap-2">
-                    <i class="fa-solid fa-cart-shopping"></i> Mi Carrito de Compras
-                </h3>
-                <button type="button" onclick="closeCartModal()" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+                <h3 class="text-xl font-bold text-pink-400">Mi Carrito</h3>
+                <button type="button" onclick="closeCartModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
             <div id="cart-items-container" class="overflow-y-auto space-y-3 my-2 pr-1 max-h-[50vh]"></div>
-
             <div class="border-t border-purple-900/40 pt-4 space-y-3">
                 <div class="flex justify-between items-center text-sm font-bold">
-                    <span class="text-slate-400">Total a Pagar:</span>
+                    <span class="text-slate-400">Total:</span>
                     <span id="cart-total-price" class="text-2xl text-emerald-400 font-extrabold">$0.00 MXN</span>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" onclick="clearCart()" class="w-1/3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-xs transition">
-                        Vaciar
-                    </button>
-                    <button type="button" onclick="checkoutCart()" class="w-2/3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-teal-600/30">
-                        Pagar con Saldo
-                    </button>
+                    <button type="button" onclick="clearCart()" class="w-1/3 bg-slate-800 text-slate-300 font-bold py-3 rounded-xl text-xs">Vaciar</button>
+                    <button type="button" onclick="checkoutCart()" class="w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm">Pagar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Admin PIN -->
     <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-amber-500/40 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
             <h3 class="text-lg font-bold text-amber-400">Acceso Administrador</h3>
-            <input type="password" id="admin-pin-input" placeholder="••••••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-lg text-white">
+            <input type="password" id="admin-pin-input" placeholder="PIN" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-center text-lg text-white">
             <div class="flex justify-end gap-2">
                 <button type="button" onclick="closeAdminModal()" class="bg-slate-800 px-4 py-2 rounded-xl text-xs">Cancelar</button>
                 <button type="button" onclick="verifyAdminPIN()" class="bg-amber-600 px-5 py-2 rounded-xl text-xs font-bold">Ingresar</button>
@@ -412,44 +309,25 @@
         </div>
     </div>
 
-    <!-- Modal Recarga -->
     <div id="topup-modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-[100] backdrop-blur-md">
         <div class="bg-slate-900 border border-purple-900/50 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-pink-400">Cómo recargar saldo</h3>
+            <h3 class="text-xl font-bold text-pink-400">Recargar Saldo</h3>
             <div class="space-y-3 text-xs text-slate-300">
-                <p>1. Transfiere o deposita la cantidad que desees a la siguiente cuenta:</p>
                 <div class="bg-slate-950 p-3 rounded-xl border border-purple-900/30 font-mono space-y-1">
-                    <p>Banco: <span id="bank-name-display" class="text-white font-bold">BBVA / Banco Azteca</span></p>
-                    <p>CLABE: <span id="bank-clabe-display" class="text-white font-bold">123456789012345678</span></p>
-                    <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Administrador Streaming</span></p>
+                    <p>Banco: <span id="bank-name-display" class="text-white font-bold">BBVA</span></p>
+                    <p>CLABE: <span id="bank-clabe-display" class="text-white font-bold">1234567890</span></p>
+                    <p>Titular: <span id="bank-holder-display" class="text-white font-bold">Admin</span></p>
                 </div>
-                
-                <button type="button" onclick="copyBankDetails()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition text-xs shadow-lg shadow-blue-600/30">
-                    <i class="fa-solid fa-copy"></i> Copiar Datos Bancarios
-                </button>
-
-                <p>2. Tu ID de cliente: <strong id="topup-user-id" class="text-pink-400 font-mono text-sm">CLI-0000</strong></p>
-                <p>3. Envía tu comprobante de pago con tu ID por WhatsApp al número <strong class="text-white">9241955327</strong> para acreditar tu saldo al instante:</p>
-                
-                <a href="https://wa.me/529241955327?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20" target="_blank" id="whatsapp-support-link" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-600/30 text-sm">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Enviar Comprobante por WhatsApp
-                </a>
+                <p>Tu ID: <strong id="topup-user-id" class="text-pink-400 font-mono">CLI-0000</strong></p>
+                <a href="https://wa.me/529241955327?text=Hola,%20mi%20ID%20es:%20" target="_blank" id="whatsapp-support-link" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm">Enviar Comprobante</a>
             </div>
-            <button type="button" onclick="closeTopUpModal()" class="w-full bg-slate-800 hover:bg-slate-700 font-bold py-2.5 rounded-xl text-xs text-slate-300 transition mt-2">
-                Cerrar Ventana
-            </button>
+            <button type="button" onclick="closeTopUpModal()" class="w-full bg-slate-800 py-2 rounded-xl text-xs text-slate-300">Cerrar</button>
         </div>
     </div>
 
-    <!-- SCRIPT -->
     <script>
-        const firebaseConfig = {
-            databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com"
-        };
-
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        const firebaseConfig = { databaseURL: "https://tienda-streaming-c1b24-default-rtdb.firebaseio.com" };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const database = firebase.database();
 
         let cart = [];
@@ -457,22 +335,17 @@
         let globalStock = {};
 
         const defaultProducts = [
-            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, durationDays: 30, durationText: 'Duración: 30 días', image: '' },
-            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, durationDays: 30, durationText: 'Duración: 30 días', image: '' }
+            { id: 'netflix-1p', name: 'Netflix (1 Pantalla)', price: 70, durationDays: 30, image: '' },
+            { id: 'netflix-comp', name: 'Netflix premium mes', price: 190, durationDays: 30, image: '' },
+            { id: 'disney-prem', name: 'Disney+ Premium', price: 190, durationDays: 30, image: '' },
+            { id: 'vix-1m', name: 'ViX Premium (1 Mes)', price: 110, durationDays: 30, image: '' },
+            { id: 'max-1m', name: 'Max / HBO (1 Mes)', price: 150, durationDays: 30, image: '' },
+            { id: 'prime-1m', name: 'Amazon Prime Video (1 Mes)', price: 90, durationDays: 30, image: '' },
+            { id: 'spotify-1m', name: 'Spotify Individual (1 Mes)', price: 100, durationDays: 30, image: '' },
+            { id: 'youtube-1m', name: 'YouTube Premium (1 Mes)', price: 70, durationDays: 30, image: '' },
+            { id: 'canva-pro', name: 'Canva Pro (1 Mes)', price: 60, durationDays: 30, image: '' },
+            { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, durationDays: 30, image: '' }
         ];
-
-        function generateUniqueClientID() {
-            const randomNum = Math.floor(100000 + Math.random() * 900000);
-            return `CLI-${randomNum}`;
-        }
 
         function initRealtimeSync() {
             database.ref('store/products').on('value', (snapshot) => {
@@ -490,59 +363,30 @@
                 renderProducts();
             });
 
-            database.ref('store/background').on('value', (snapshot) => {
-                const bgUrl = snapshot.val();
-                if (bgUrl) {
-                    applyStoreBackground(bgUrl);
-                } else {
-                    document.body.style.backgroundImage = 'none';
-                }
-            });
-
             database.ref('store/bankInfo').on('value', (snapshot) => {
                 const bank = snapshot.val() || {};
-                const name = bank.name || 'BBVA / Banco Azteca';
-                const clabe = bank.clabe || '123456789012345678';
-                const holder = bank.holder || 'Administrador Streaming';
-
-                document.getElementById('bank-name-display').innerText = name;
-                document.getElementById('bank-clabe-display').innerText = clabe;
-                document.getElementById('bank-holder-display').innerText = holder;
-                
-                const adminName = document.getElementById('admin-bank-name');
-                const adminClabe = document.getElementById('admin-bank-clabe');
-                const adminHolder = document.getElementById('admin-bank-holder');
-                if(adminName && !adminName.value) adminName.value = name;
-                if(adminClabe && !adminClabe.value) adminClabe.value = clabe;
-                if(adminHolder && !adminHolder.value) adminHolder.value = holder;
+                document.getElementById('bank-name-display').innerText = bank.name || 'BBVA';
+                document.getElementById('bank-clabe-display').innerText = bank.clabe || '1234567890';
+                document.getElementById('bank-holder-display').innerText = bank.holder || 'Admin';
             });
         }
 
-        // --- CREAR NUEVO PRODUCTO DESDE EL ADMIN ---
         function createNewProduct() {
             const name = document.getElementById('new-prod-name').value.trim();
             const price = parseFloat(document.getElementById('new-prod-price').value);
             const days = parseInt(document.getElementById('new-prod-days').value) || 30;
 
-            if (!name || isNaN(price) || price <= 0) {
-                alert('Escribe un nombre válido y un precio mayor a 0.');
+            if (!name || isNaN(price)) {
+                alert('Escribe un nombre y precio válidos.');
                 return;
             }
 
-            const newId = 'prod-' + Math.random().toString(36.substring(2, 9));
+            const newId = 'prod-' + Math.random().toString(36).substring(2, 9);
             let currentProducts = [...(globalProducts.length > 0 ? globalProducts : defaultProducts)];
-
-            currentProducts.push({
-                id: newId,
-                name: name,
-                price: price,
-                durationDays: days,
-                durationText: `Duración: ${days} días`,
-                image: ''
-            });
+            currentProducts.push({ id: newId, name: name, price: price, durationDays: days, image: '' });
 
             database.ref('store/products').set(currentProducts).then(() => {
-                alert('¡Nuevo producto creado y sincronizado con éxito!');
+                alert('¡Producto creado con éxito!');
                 document.getElementById('new-prod-name').value = '';
                 document.getElementById('new-prod-price').value = '';
             });
@@ -551,700 +395,167 @@
         function renderProducts() {
             const grid = document.getElementById('products-grid');
             if (!grid) return;
-            
             const currentProducts = globalProducts.length > 0 ? globalProducts : defaultProducts;
-            const stockData = globalStock;
 
             grid.innerHTML = currentProducts.map(p => {
-                const prodStock = stockData[p.id] ? Object.values(stockData[p.id]) : [];
+                const prodStock = globalStock[p.id] ? Object.values(globalStock[p.id]) : [];
                 const hasStock = prodStock.length > 0;
-                const durationLabel = p.durationText || (p.durationDays ? `Duración: ${p.durationDays} días` : 'Duración: 30 días');
-
-                const imageContent = p.image 
-                    ? `<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('${p.image}')"></div>`
-                    : `<h3 class="text-2xl font-black tracking-widest text-red-500 drop-shadow-[0_2px_10px_rgba(220,38,38,0.5)] z-10">${p.name.split(' ')[0]}</h3>`;
+                const imgStyle = p.image ? `background-image: url('${p.image}')` : '';
 
                 return `
-                    <div class="bg-slate-900/90 border border-purple-900/40 rounded-3xl overflow-hidden shadow-2xl glow-card relative flex flex-col justify-between">
+                    <div class="bg-slate-900/90 border border-purple-900/40 rounded-3xl overflow-hidden shadow-2xl relative flex flex-col justify-between">
                         <div class="absolute top-4 right-4 z-20">
-                            ${hasStock 
-                                ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-bold">Disponible (${prodStock.length})</span>`
-                                : `<span class="bg-red-500/20 text-red-400 border border-red-500/30 text-xs px-3 py-1 rounded-full font-bold">Agotado</span>`
-                            }
+                            ${hasStock ? `<span class="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-bold">Disponible (${prodStock.length})</span>` : `<span class="bg-red-500/20 text-red-400 text-xs px-3 py-1 rounded-full font-bold">Agotado</span>`}
                         </div>
-
-                        <div class="h-36 bg-gradient-to-b from-black/60 to-slate-950 flex items-center justify-center relative border-b border-purple-900/20 overflow-hidden">
-                            ${imageContent}
+                        <div class="h-36 bg-cover bg-center flex items-center justify-center relative border-b border-purple-900/20" style="${imgStyle}">
+                            {!p.image ? `<h3 class="text-xl font-black text-red-500">${p.name}</h3>` : ''}
                         </div>
-
                         <div class="p-6 space-y-4">
-                            <div class="space-y-1">
-                                <h3 class="text-lg font-bold text-white">${p.name}</h3>
-                                <p class="text-xs text-slate-400">${durationLabel}</p>
-                            </div>
-                            <p class="text-3xl font-black text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400 font-normal">MXN</span></p>
-                            
-                            ${hasStock 
-                                ? `<button onclick="addToCart('${p.id}', '${p.name}', ${p.price}, ${p.durationDays || 30})" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 font-bold py-3 rounded-2xl text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-cart-plus"></i> Agregar al Carrito
-                                   </button>`
-                                : `<button disabled class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-2xl text-sm cursor-not-allowed">Sin Stock</button>`
-                            }
+                            <h3 class="text-lg font-bold text-white">${p.name}</h3>
+                            <p class="text-3xl font-black text-emerald-400">$${p.price}.00 <span class="text-xs text-slate-400">MXN</span></p>
+                            ${hasStock ? `<button onclick="addToCart('${p.id}', '${p.name}', ${p.price}, ${p.durationDays || 30})" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-3 rounded-2xl text-sm transition">Agregar al Carrito</button>` : `<button disabled class="w-full bg-slate-800 text-slate-500 font-bold py-3 rounded-2xl text-sm">Sin Stock</button>`}
                         </div>
                     </div>
                 `;
             }).join('');
 
-            ['price-product-id', 'stock-product-id', 'image-product-id'].forEach(selId => {
-                const sel = document.getElementById(selId);
-                if (sel) {
-                    sel.innerHTML = currentProducts.map(prod => `<option value="${prod.id}">${prod.name} ($${prod.price})</option>`).join('');
-                }
-            });
-            loadProductDetailsToForm();
-        }
-
-        function loadProductDetailsToForm() {
-            const selectEl = document.getElementById('image-product-id');
-            if (!selectEl) return;
-            const prodId = selectEl.value;
-            const currentProducts = globalProducts.length > 0 ? globalProducts : defaultProducts;
-            const p = currentProducts.find(item => item.id === prodId);
-            if (p) {
-                const nameInput = document.getElementById('edit-product-name');
-                const daysInput = document.getElementById('edit-product-duration-days');
-                if (nameInput) nameInput.value = p.name;
-                if (daysInput) daysInput.value = p.durationDays || 30;
-            }
-        }
-
-        function updateProductVisuals() {
-            const prodId = document.getElementById('image-product-id').value;
-            const newName = document.getElementById('edit-product-name').value.trim();
-            const newDays = parseInt(document.getElementById('edit-product-duration-days').value) || 30;
-            const fileInput = document.getElementById('edit-product-file');
-
-            let currentProducts = [...(globalProducts.length > 0 ? globalProducts : defaultProducts)];
-            const index = currentProducts.findIndex(p => p.id === prodId);
-
-            if (index !== -1) {
-                if (newName) currentProducts[index].name = newName;
-                currentProducts[index].durationDays = newDays;
-                currentProducts[index].durationText = `Duración: ${newDays} días`;
-
-                if (fileInput.files && fileInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        currentProducts[index].image = e.target.result;
-                        database.ref('store/products').set(currentProducts).then(() => {
-                            alert('¡Producto, duración e imagen actualizados y sincronizados!');
-                        });
-                    };
-                    reader.readAsDataURL(fileInput.files[0]);
-                } else {
-                    database.ref('store/products').set(currentProducts).then(() => {
-                        alert('¡Nombre y duración actualizados y sincronizados!');
-                    });
-                }
-            }
-        }
-
-        function updateStoreBackground() {
-            const fileInput = document.getElementById('store-bg-file');
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const bgDataUrl = e.target.result;
-                    database.ref('store/background').set(bgDataUrl).then(() => {
-                        alert('¡Fondo de la tienda actualizado para todos!');
-                    });
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                alert('Por favor selecciona una imagen.');
-            }
-        }
-
-        function applyStoreBackground(bgUrl) {
-            const bodyEl = document.body;
-            if (bgUrl) {
-                bodyEl.style.backgroundImage = `linear-gradient(rgba(9, 5, 20, 0.85), rgba(30, 16, 53, 0.85)), url('${bgUrl}')`;
-            }
-        }
-
-        function resetStoreBackground() {
-            database.ref('store/background').remove().then(() => {
-                document.body.style.backgroundImage = 'none';
-                alert('Fondo restaurado.');
+            ['price-product-id', 'stock-product-id', 'image-product-id'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (sel) sel.innerHTML = currentProducts.map(prod => `<option value="${prod.id}">${prod.name} ($${prod.price})</option>`).join('');
             });
         }
 
-        function addToCart(productId, productName, price, durationDays) {
-            const stockData = globalStock;
-            const prodStock = stockData[productId] ? Object.values(stockData[productId]) : [];
-            
-            const existingItem = cart.find(item => item.id === productId);
-            const currentQtyInCart = existingItem ? existingItem.qty : 0;
-
-            if (currentQtyInCart + 1 > prodStock.length) {
-                alert(`Solo hay ${prodStock.length} cuentas disponibles de ${productName}.`);
-                return;
-            }
-
-            if (existingItem) {
-                existingItem.qty += 1;
-            } else {
-                cart.push({ id: productId, name: productName, price: price, durationDays: durationDays, qty: 1 });
-            }
-
+        function addToCart(id, name, price, days) {
+            const existing = cart.find(i => i.id === id);
+            if (existing) { existing.qty += 1; } else { cart.push({ id, name, price, durationDays: days, qty: 1 }); }
             updateCartUI();
-            alert(`¡${productName} agregado al carrito! 🛒`);
+            alert('Agregado al carrito');
         }
 
         function updateCartUI() {
-            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
-            const badgeHeader = document.getElementById('cart-badge-header');
-            const badgeFloat = document.getElementById('cart-badge-float');
-
-            [badgeHeader, badgeFloat].forEach(badge => {
-                if (badge) {
-                    badge.innerText = totalItems;
-                    if (totalItems > 0) {
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
+            const total = cart.reduce((acc, item) => acc + item.qty, 0);
+            ['cart-badge-header', 'cart-badge-float'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerText = total;
+                    if (total > 0) el.classList.remove('hidden'); else el.classList.add('hidden');
                 }
             });
-
             renderCartItems();
         }
 
         function renderCartItems() {
             const container = document.getElementById('cart-items-container');
-            const totalElement = document.getElementById('cart-total-price');
+            const totalEl = document.getElementById('cart-total-price');
             if (!container) return;
-
-            if (cart.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-500 py-6">Tu carrito está vacío 🛒</p>`;
-                if (totalElement) totalElement.innerText = '$0.00 MXN';
-                return;
-            }
-
+            if (cart.length === 0) { container.innerHTML = '<p class="text-center text-slate-500">Carrito vacío</p>'; if(totalEl) totalEl.innerText = '$0.00 MXN'; return; }
             let total = 0;
             container.innerHTML = cart.map(item => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
-
-                return `
-                    <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-purple-900/40 flex items-center justify-between gap-3">
-                        <div class="space-y-0.5">
-                            <h4 class="font-bold text-sm text-white">${item.name}</h4>
-                            <p class="text-xs text-emerald-400 font-bold">$${item.price}.00 MXN c/u (${item.durationDays || 30} días)</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="changeCartQty('${item.id}', -1)" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center font-bold text-xs">-</button>
-                            <span class="font-mono text-pink-400 font-bold text-sm w-4 text-center">${item.qty}</span>
-                            <button onclick="changeCartQty('${item.id}', 1)" class="w-7 h-7 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center font-bold text-xs">+</button>
-                            <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 ml-2 p-1 text-xs" title="Eliminar">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
+                total += item.price * item.qty;
+                return `<div class="bg-slate-950 p-3 rounded-xl flex justify-between items-center text-sm"><span>${item.name} (x${item.qty})</span><span class="text-emerald-400">$${item.price * item.qty}</span></div>`;
             }).join('');
-
-            if (totalElement) totalElement.innerText = `$${total.toFixed(2)} MXN`;
+            if(totalEl) totalEl.innerText = `$${total.toFixed(2)} MXN`;
         }
 
-        function changeCartQty(productId, delta) {
-            const stockData = globalStock;
-            const prodStock = stockData[productId] ? Object.values(stockData[productId]) : [];
-            const item = cart.find(i => i.id === productId);
-
-            if (item) {
-                if (delta > 0 && item.qty + 1 > prodStock.length) {
-                    alert(`No hay más stock disponible de este producto.`);
-                    return;
-                }
-
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    cart = cart.filter(i => i.id !== productId);
-                }
-            }
-            updateCartUI();
-        }
-
-        function removeFromCart(productId) {
-            cart = cart.filter(i => i.id !== productId);
-            updateCartUI();
-        }
-
-        function clearCart() {
-            cart = [];
-            updateCartUI();
-        }
-
-        function openCartModal() {
-            renderCartItems();
-            document.getElementById('cart-modal').classList.remove('hidden');
-        }
-
-        function closeCartModal() {
-            document.getElementById('cart-modal').classList.add('hidden');
-        }
+        function clearCart() { cart = []; updateCartUI(); }
+        function openCartModal() { document.getElementById('cart-modal').classList.remove('hidden'); }
+        function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
         function checkoutCart() {
-            if (cart.length === 0) {
-                alert('Tu carrito está vacío.');
-                return;
-            }
-
+            if (cart.length === 0) return;
             const currentID = localStorage.getItem('currentClientID');
-            const currentUsername = localStorage.getItem('currentUser') || 'Cliente';
             const clientRef = database.ref('clients/' + currentID);
             const totalAmount = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
-            clientRef.once('value').then((snapshot) => {
-                const data = snapshot.val() || {};
-                let currentBalance = data.balance || 0;
-
-                if (currentBalance < totalAmount) {
-                    alert(`Saldo insuficiente. Requieres $${totalAmount.toFixed(2)} MXN y tienes $${currentBalance.toFixed(2)} MXN.`);
-                    closeCartModal();
-                    openTopUpModal();
-                    return;
-                }
-
-                if (confirm(`¿Confirmar compra total por $${totalAmount.toFixed(2)} MXN?`)) {
-                    database.ref('store/stock').once('value').then((stockSnapshot) => {
-                        let stockData = stockSnapshot.val() || {};
-                        let newPurchasesPromises = [];
-                        const now = new Date();
-                        const purchaseDateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                        let purchaseFailed = false;
+            clientRef.once('value').then(snap => {
+                const data = snap.val() || {};
+                if ((data.balance || 0) < totalAmount) { alert('Saldo insuficiente'); closeCartModal(); openTopUpModal(); return; }
+                if (confirm('¿Confirmar compra?')) {
+                    database.ref('store/stock').once('value').then(stockSnap => {
+                        let stockData = stockSnap.val() || {};
+                        let newPurchases = [];
+                        let now = new Date();
 
                         cart.forEach(item => {
                             let prodStockObj = stockData[item.id] || {};
-                            let stockKeys = Object.keys(prodStockObj);
-                            const days = item.durationDays || 30;
-
-                            if (stockKeys.length < item.qty) {
-                                alert(`Lo sentimos, el stock de ${item.name} acaba de cambiar y ya no hay suficientes.`);
-                                purchaseFailed = true;
-                                return;
-                            }
-
-                            for (let i = 0; i < item.qty; i++) {
-                                let stockKeyToRemove = stockKeys.shift();
-                                let assignedCredentials = prodStockObj[stockKeyToRemove];
-                                delete prodStockObj[stockKeyToRemove];
-
-                                const newPurchaseRef = clientRef.child('purchases').push();
-                                const expire = new Date();
-                                expire.setDate(now.getDate() + parseInt(days));
-                                const expireDateStr = expire.toISOString().split('T')[0];
-
-                                newPurchasesPromises.push(newPurchaseRef.set({
-                                    clientName: currentUsername,
-                                    clientId: currentID,
-                                    productName: item.name,
-                                    price: item.price,
-                                    credentials: assignedCredentials,
-                                    purchaseDate: purchaseDateStr,
-                                    expireDate: expireDateStr
+                            let keys = Object.keys(prodStockObj);
+                            for(let i=0; i<item.qty; i++) {
+                                let key = keys.shift();
+                                let creds = prodStockObj[key];
+                                delete prodStockObj[key];
+                                let exp = new Date(); exp.setDate(now.getDate() + item.durationDays);
+                                newPurchases.push(clientRef.child('purchases').push().set({
+                                    productName: item.name, price: item.price, credentials: creds,
+                                    purchaseDate: now.toLocaleDateString(), expireDate: exp.toISOString().split('T')[0]
                                 }));
                             }
                             stockData[item.id] = prodStockObj;
                         });
 
-                        if (purchaseFailed) return;
-
-                        const newBalance = currentBalance - totalAmount;
-
                         Promise.all([
-                            clientRef.child('balance').set(newBalance),
+                            clientRef.child('balance').set((data.balance || 0) - totalAmount),
                             database.ref('store/stock').set(stockData),
-                            ...newPurchasesPromises
-                        ]).then(() => {
-                            alert('¡Compra realizada con éxito! Tus cuentas ya están listas abajo.');
-                            clearCart();
-                            closeCartModal();
-                            loadGlobalSalesStats();
-                        });
+                            ...newPurchases
+                        ]).then(() => { alert('¡Compra exitosa!'); clearCart(); closeCartModal(); });
                     });
                 }
             });
         }
 
-        function copyAccountCredentials(elementId) {
-            const credsElement = document.getElementById(elementId);
-            if (credsElement) {
-                const textToCopy = credsElement.innerText;
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    alert('¡Credenciales copiadas al portapapeles con éxito! 📋✨');
-                }).catch(err => {
-                    alert('No se pudo copiar automáticamente.');
-                });
-            }
-        }
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-username').value.trim();
+            if(!user) return;
+            let clientId = localStorage.getItem(`clientID_${user}`) || 'CLI-' + Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem(`clientID_${user}`, clientId);
+            localStorage.setItem('currentUser', user);
+            localStorage.setItem('currentClientID', clientId);
 
-        function loadGlobalSalesStats() {
-            const clientsRef = database.ref('clients');
-            clientsRef.on('value', (snapshot) => {
-                let totalSoldCount = 0;
-                let totalMoneyEarned = 0;
-                let allPurchasesHTML = '';
-
-                const clientsData = snapshot.val() || {};
-                const todayStr = new Date().toISOString().split('T')[0];
-
-                Object.entries(clientsData).forEach(([clientId, client]) => {
-                    if (client.purchases) {
-                        Object.values(client.purchases).forEach(purchase => {
-                            totalSoldCount += 1;
-                            totalMoneyEarned += parseFloat(purchase.price || 0);
-
-                            const expireDate = purchase.expireDate || '';
-                            let badgeStyle = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-                            let statusText = `Vence: ${expireDate}`;
-
-                            if (expireDate) {
-                                const today = new Date(todayStr);
-                                const exp = new Date(expireDate);
-                                const diffDays = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
-
-                                if (diffDays < 0) {
-                                    badgeStyle = 'bg-red-500/20 text-red-400 border-red-500/30 animate-pulse';
-                                    statusText = `¡VENCIDA! (${expireDate})`;
-                                } else if (diffDays <= 3) {
-                                    badgeStyle = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
-                                    statusText = `Por vencer (${expireDate})`;
-                                }
-                            }
-
-                            const clientDisplayName = purchase.clientName || client.username || 'Cliente';
-
-                            allPurchasesHTML += `
-                                <tr class="hover:bg-purple-950/20 transition">
-                                    <td class="p-3">
-                                        <div class="font-bold text-white">${clientDisplayName}</div>
-                                        <div class="text-xs text-pink-400 font-mono">${purchase.clientId || clientId}</div>
-                                    </td>
-                                    <td class="p-3 font-bold text-white">${purchase.productName}</td>
-                                    <td class="p-3 font-mono text-cyan-400 select-all">${purchase.credentials}</td>
-                                    <td class="p-3 text-emerald-400 font-bold">$${purchase.price} MXN</td>
-                                    <td class="p-3 text-slate-300 text-xs">${purchase.purchaseDate}</td>
-                                    <td class="p-3 text-xs">
-                                        <span class="px-2.5 py-1 rounded-lg border font-bold inline-block ${badgeStyle}">
-                                            ${statusText}
-                                        </span>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-                });
-
-                const countEl = document.getElementById('admin-total-sold-count');
-                const moneyEl = document.getElementById('admin-total-money');
-                const historyEl = document.getElementById('admin-all-purchases-list');
-
-                if (countEl) countEl.innerText = totalSoldCount;
-                if (moneyEl) moneyEl.innerText = `$${totalMoneyEarned.toFixed(2)} MXN`;
-                if (historyEl) {
-                    historyEl.innerHTML = allPurchasesHTML || `<tr><td colspan="6" class="p-4 text-center text-slate-500">No hay cuentas vendidas aún.</td></tr>`;
-                }
+            database.ref('clients/' + clientId).once('value').then(snap => {
+                if(!snap.exists()) database.ref('clients/' + clientId).set({ username: user, balance: 0 });
             });
+            location.reload();
         }
 
-        function resetSalesStats() {
-            if (confirm('¿Estás seguro de reiniciar los contadores? Esto eliminará el historial de compras de todos los clientes en Firebase y dejará las estadísticas en 0.')) {
-                const clientsRef = database.ref('clients');
-                clientsRef.once('value').then((snapshot) => {
-                    const clientsData = snapshot.val() || {};
-                    let updates = {};
-
-                    Object.keys(clientsData).forEach(clientId => {
-                        updates[`clients/${clientId}/purchases`] = null;
-                    });
-
-                    database.ref().update(updates).then(() => {
-                        alert('¡Estadísticas reiniciadas con éxito!');
-                        loadGlobalSalesStats();
-                    }).catch(error => {
-                        alert('Error al reiniciar: ' + error.message);
-                    });
-                });
-            }
+        function handleRegister(e) {
+            e.preventDefault();
+            handleLogin(e);
         }
 
-        function copyBankDetails() {
-            const bank = document.getElementById('bank-name-display').innerText;
-            const clabe = document.getElementById('bank-clabe-display').innerText;
-            const holder = document.getElementById('bank-holder-display').innerText;
-
-            const textToCopy = `Banco: ${bank}\nCLABE: ${clabe}\nTitular: ${holder}`;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert('¡Datos bancarios copiados al portapapeles!');
-            }).catch(err => {
-                alert('Error al copiar los datos.');
-            });
-        }
-
-        function addCreditByClientID() {
-            const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
-            const amount = parseFloat(document.getElementById('add-credit-amount').value);
-
-            if (!targetClientId || isNaN(amount) || amount <= 0) {
-                alert('Por favor ingresa un ID de cliente válido y un monto mayor a 0.');
-                return;
-            }
-
-            const clientBalanceRef = database.ref('clients/' + targetClientId + '/balance');
-
-            clientBalanceRef.transaction((currentBalance) => {
-                return (currentBalance || 0) + amount;
-            }, (error, committed) => {
-                if (error) {
-                    alert('Error al enviar saldo a Firebase: ' + error.message);
-                } else if (committed) {
-                    alert(`¡ÉXITO! Se agregaron $${amount.toFixed(2)} MXN al ID ${targetClientId} en Firebase.`);
-                    document.getElementById('add-credit-client-id').value = '';
-                    document.getElementById('add-credit-amount').value = '100';
-                }
-            });
-        }
-
-        function listenUserData(clientID) {
-            const clientRef = database.ref('clients/' + clientID);
-            const currentUsername = localStorage.getItem('currentUser') || 'Cliente';
-            
-            clientRef.on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                const balance = data.balance || 0;
-                document.getElementById('user-balance').innerText = `$${parseFloat(balance).toFixed(2)}`;
-
-                const purchasesList = document.getElementById('purchases-list');
-                if (data.purchases) {
-                    let html = '';
-                    Object.entries(data.purchases).forEach(([purchaseId, item]) => {
-                        const supportMsg = `Hola, soy ${currentUsername} (ID: ${clientID}). Tengo un problema con mi cuenta de ${item.productName} comprada el ${item.purchaseDate}. Las credenciales son: ${item.credentials}`;
-                        const encodedMsg = encodeURIComponent(supportMsg);
-
-                        html += `
-                            <tr class="hover:bg-purple-950/20 transition">
-                                <td class="p-3 font-bold text-white">${item.productName}</td>
-                                <td class="p-3 font-mono text-pink-400 select-all" id="creds-${purchaseId}">${item.credentials}</td>
-                                <td class="p-3 text-emerald-400 font-bold">$${item.price} MXN</td>
-                                <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
-                                <td class="p-3 text-xs space-y-2">
-                                    <div class="text-amber-400 font-bold">${item.expireDate}</div>
-                                    <div class="flex items-center gap-1.5 flex-wrap">
-                                        <button onclick="copyAccountCredentials('creds-${purchaseId}')" class="inline-flex items-center gap-1 bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
-                                            <i class="fa-solid fa-copy"></i> Copiar Cuenta
-                                        </button>
-                                        <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
-                                            <i class="fa-brands fa-whatsapp"></i> Soporte
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    purchasesList.innerHTML = html;
-                } else {
-                    purchasesList.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>`;
-                }
-            });
-        }
+        function logout() { localStorage.removeItem('currentUser'); localStorage.removeItem('currentClientID'); location.reload(); }
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+        function verifyAdminPIN() { if(document.getElementById('admin-pin-input').value.length > 0) { closeAdminModal(); document.getElementById('tab-shop').classList.add('hidden'); document.getElementById('tab-admin').classList.remove('hidden'); } else { alert('PIN Incorrecto'); } }
+        function switchTab(tab) { if(tab === 'shop') { document.getElementById('tab-admin').classList.add('hidden'); document.getElementById('tab-shop').classList.remove('hidden'); } }
+        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
+        function copyClientID() { navigator.clipboard.writeText(localStorage.getItem('currentClientID')); alert('ID copiado'); }
 
         function addStock() {
             const prodId = document.getElementById('stock-product-id').value;
             const creds = document.getElementById('stock-credentials').value.trim();
-
-            if (!prodId || !creds) {
-                alert('Selecciona un producto y escribe las credenciales.');
-                return;
-            }
-
-            database.ref('store/stock/' + prodId).push(creds).then(() => {
-                document.getElementById('stock-credentials').value = '';
-                alert('¡Stock guardado en Firebase con éxito!');
-            });
-        }
-
-        function updateBankInfo() {
-            const name = document.getElementById('admin-bank-name').value;
-            const clabe = document.getElementById('admin-bank-clabe').value;
-            const holder = document.getElementById('admin-bank-holder').value;
-
-            database.ref('store/bankInfo').set({
-                name: name,
-                clabe: clabe,
-                holder: holder
-            }).then(() => {
-                alert('Datos bancarios actualizados en Firebase.');
-            });
-        }
-
-        function updateClientIDDisplays(clientId) {
-            ['user-client-id', 'user-id-banner', 'topup-user-id'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerText = clientId;
-            });
-
-            const waLink = document.getElementById('whatsapp-support-link');
-            if (waLink) {
-                waLink.href = `https://wa.me/529241955327?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20${clientId}`;
-            }
-        }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('login-username').value.trim();
-            if (!username) return;
-            
-            let clientId = localStorage.getItem(`clientID_${username}`);
-            if (!clientId) {
-                clientId = generateUniqueClientID();
-                localStorage.setItem(`clientID_${username}`, clientId);
-            }
-
-            localStorage.setItem('currentUser', username);
-            localStorage.setItem('currentClientID', clientId);
-
-            database.ref('clients/' + clientId).once('value').then((snapshot) => {
-                if (!snapshot.exists()) {
-                    database.ref('clients/' + clientId).set({
-                        username: username,
-                        balance: 0
-                    });
-                }
-            });
-
-            document.getElementById('auth-screen').classList.add('hidden');
-            location.reload();
-        }
-
-        function handleRegister(event) {
-            event.preventDefault();
-            const username = document.getElementById('reg-username').value.trim();
-            if (!username) return;
-            
-            let clientId = localStorage.getItem(`clientID_${username}`);
-            if (!clientId) {
-                clientId = generateUniqueClientID();
-                localStorage.setItem(`clientID_${username}`, clientId);
-            }
-
-            localStorage.setItem('currentUser', username);
-            localStorage.setItem('currentClientID', clientId);
-
-            database.ref('clients/' + clientId).set({
-                username: username,
-                balance: 0
-            });
-
-            document.getElementById('auth-screen').classList.add('hidden');
-            location.reload();
-        }
-
-        function switchAuthTab(tab) {
-            const loginForm = document.getElementById('form-login');
-            const registerForm = document.getElementById('form-register');
-            const btnLogin = document.getElementById('btn-tab-login');
-            const btnRegister = document.getElementById('btn-tab-register');
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
-                btnRegister.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
-            } else {
-                registerForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-                btnRegister.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
-                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('currentClientID');
-            location.reload();
-        }
-
-        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
-        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
-
-        function verifyAdminPIN() {
-            const pin = document.getElementById('admin-pin-input').value;
-            if (pin.length > 0) {
-                closeAdminModal();
-                document.getElementById('tab-shop').classList.add('hidden');
-                document.getElementById('tab-admin').classList.remove('hidden');
-            } else {
-                alert('PIN Incorrecto');
-            }
-        }
-
-        function switchTab(tab) {
-            if (tab === 'shop') {
-                document.getElementById('tab-admin').classList.add('hidden');
-                document.getElementById('tab-shop').classList.remove('hidden');
-            }
-        }
-
-        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
-        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
-
-        function copyClientID() {
-            const clientID = localStorage.getItem('currentClientID') || 'CLI-0000';
-            navigator.clipboard.writeText(clientID);
-            alert(`ID copiado al portapapeles: ${clientID}`);
-        }
-
-        function updateProductPrice() {
-            const prodId = document.getElementById('price-product-id').value;
-            const newPrice = parseFloat(document.getElementById('new-product-price').value);
-
-            if (!prodId || isNaN(newPrice) || newPrice <= 0) {
-                alert('Ingresa un precio válido.');
-                return;
-            }
-
-            let currentProducts = [...(globalProducts.length > 0 ? globalProducts : defaultProducts)];
-            const prodIndex = currentProducts.findIndex(p => p.id === prodId);
-            if (prodIndex !== -1) {
-                currentProducts[prodIndex].price = newPrice;
-                database.ref('store/products').set(currentProducts).then(() => {
-                    alert('Precio actualizado y sincronizado en tiempo real.');
-                    document.getElementById('new-product-price').value = '';
-                });
-            }
+            if(!prodId || !creds) return;
+            database.ref('store/stock/' + prodId).push(creds).then(() => { document.getElementById('stock-credentials').value = ''; alert('Stock guardado'); });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             initRealtimeSync();
-
             const user = localStorage.getItem('currentUser');
-            let clientID = localStorage.getItem('currentClientID');
-
-            if (user && clientID) {
+            const clientId = localStorage.getItem('currentClientID');
+            if(user && clientId) {
                 document.getElementById('auth-screen').classList.add('hidden');
-                const userEl = document.getElementById('welcome-username');
-                if (userEl) userEl.innerText = user;
-
-                updateClientIDDisplays(clientID);
-                listenUserData(clientID);
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('welcome-username').innerText = user;
+                document.getElementById('user-client-id').innerText = clientId;
+                document.getElementById('user-id-banner').innerText = clientId;
+                database.ref('clients/' + clientId).on('value', snap => {
+                    document.getElementById('user-balance').innerText = `$${(snap.val()?.balance || 0).toFixed(2)}`;
+                    const pList = document.getElementById('purchases-list');
+                    const purchases = snap.val()?.purchases;
+                    if(purchases) {
+                        pList.innerHTML = Object.values(purchases).map(p => `<tr><td class="p-3">${p.productName}</td><td class="p-3 font-mono text-pink-400 select-all">${p.credentials}</td><td class="p-3">$${p.price}</td><td class="p-3">${p.purchaseDate}</td><td class="p-3">${p.expireDate}</td></tr>`).join('');
+                    }
+                });
             }
-
-            loadGlobalSalesStats();
         });
     </script>
 </body>
