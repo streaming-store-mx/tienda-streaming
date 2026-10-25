@@ -535,6 +535,7 @@
         function openCartModal() { document.getElementById('cart-modal').classList.remove('hidden'); }
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
+        // --- CORRECCIÓN DE DUPLICACIÓN EN COMPRA MÚLTIPLE ---
         function checkoutCart() {
             if (cart.length === 0) return;
             const currentID = localStorage.getItem('currentClientID');
@@ -549,22 +550,38 @@
                         let stockData = stockSnap.val() || {};
                         let newPurchases = [];
                         let now = new Date();
+                        let purchaseFailed = false;
 
                         cart.forEach(item => {
                             let prodStockObj = stockData[item.id] || {};
-                            let keys = Object.keys(prodStockObj);
-                            for(let i=0; i<item.qty; i++) {
-                                let key = keys.shift();
-                                let creds = prodStockObj[key];
-                                delete prodStockObj[key];
-                                let exp = new Date(); exp.setDate(now.getDate() + item.durationDays);
+                            let stockKeys = Object.keys(prodStockObj);
+
+                            if (stockKeys.length < item.qty) {
+                                alert(`No hay suficiente stock disponible para ${item.name}.`);
+                                purchaseFailed = true;
+                                return;
+                            }
+
+                            for(let i = 0; i < item.qty; i++) {
+                                let keyToRemove = stockKeys.shift(); // Saca y remueve la llave exacta sin repetir
+                                let creds = prodStockObj[keyToRemove];
+                                delete prodStockObj[keyToRemove];
+
+                                let exp = new Date(); 
+                                exp.setDate(now.getDate() + item.durationDays);
+
                                 newPurchases.push(clientRef.child('purchases').push().set({
-                                    productName: item.name, price: item.price, credentials: creds,
-                                    purchaseDate: now.toLocaleDateString(), expireDate: exp.toISOString().split('T')[0]
+                                    productName: item.name, 
+                                    price: item.price, 
+                                    credentials: creds,
+                                    purchaseDate: now.toLocaleDateString(), 
+                                    expireDate: exp.toISOString().split('T')[0]
                                 }));
                             }
                             stockData[item.id] = prodStockObj;
                         });
+
+                        if (purchaseFailed) return;
 
                         Promise.all([
                             clientRef.child('balance').set((data.balance || 0) - totalAmount),
@@ -617,7 +634,6 @@
         }
         function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
 
-        // Copiar información completa de recarga y ID
         function copyBankInfoAndID() {
             const bank = document.getElementById('bank-name-display').innerText;
             const clabe = document.getElementById('bank-clabe-display').innerText;
@@ -677,6 +693,27 @@
                 alert('Crédito añadido con éxito');
                 document.getElementById('add-credit-client-id').value = '';
             });
+        }
+
+        // --- CORRECCIÓN DEL REINICIO DE CONTADOR ---
+        function resetSalesStats() {
+            if (confirm('¿Estás seguro de reiniciar los contadores? Esto eliminará el historial de compras de todos los clientes en Firebase.')) {
+                database.ref('clients').once('value').then((snapshot) => {
+                    const clientsData = snapshot.val() || {};
+                    let updates = {};
+
+                    Object.keys(clientsData).forEach(clientId => {
+                        updates[`clients/${clientId}/purchases`] = null;
+                    });
+
+                    database.ref().update(updates).then(() => {
+                        alert('¡Estadísticas e historial reiniciados con éxito!');
+                        loadGlobalSalesStats();
+                    }).catch(error => {
+                        alert('Error al reiniciar: ' + error.message);
+                    });
+                });
+            }
         }
 
         function loadGlobalSalesStats() {
