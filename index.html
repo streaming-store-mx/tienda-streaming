@@ -227,6 +227,28 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Crear Nuevo Producto / Opción -->
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-emerald-900/40 space-y-4 shadow-lg">
+                    <h3 class="font-bold text-lg text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> Crear Nuevo Producto
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-400">Nombre del Servicio</label>
+                            <input type="text" id="new-prod-name" placeholder="Ej. Paramount+ (1 Mes)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Precio MXN</label>
+                            <input type="number" id="new-prod-price" placeholder="120" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400">Duración en Días</label>
+                            <input type="number" id="new-prod-days" value="30" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm mt-1 text-white">
+                        </div>
+                        <button type="button" onclick="createNewProduct()" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">Agregar Producto</button>
+                    </div>
+                </div>
+
                 <!-- Datos Bancarios -->
                 <div class="bg-slate-900/60 p-6 rounded-2xl border border-blue-900/40 space-y-4 shadow-lg">
                     <h3 class="font-bold text-lg text-blue-400 flex items-center gap-2">
@@ -452,9 +474,7 @@
             return `CLI-${randomNum}`;
         }
 
-        // --- SINCRONIZACIÓN EN TIEMPO REAL CON FIREBASE ---
         function initRealtimeSync() {
-            // Sincronizar Productos
             database.ref('store/products').on('value', (snapshot) => {
                 if (snapshot.exists()) {
                     globalProducts = snapshot.val();
@@ -465,13 +485,11 @@
                 renderProducts();
             });
 
-            // Sincronizar Stock
             database.ref('store/stock').on('value', (snapshot) => {
                 globalStock = snapshot.val() || {};
                 renderProducts();
             });
 
-            // Sincronizar Fondo de la Tienda
             database.ref('store/background').on('value', (snapshot) => {
                 const bgUrl = snapshot.val();
                 if (bgUrl) {
@@ -481,7 +499,6 @@
                 }
             });
 
-            // Sincronizar Datos Bancarios
             database.ref('store/bankInfo').on('value', (snapshot) => {
                 const bank = snapshot.val() || {};
                 const name = bank.name || 'BBVA / Banco Azteca';
@@ -498,6 +515,36 @@
                 if(adminName && !adminName.value) adminName.value = name;
                 if(adminClabe && !adminClabe.value) adminClabe.value = clabe;
                 if(adminHolder && !adminHolder.value) adminHolder.value = holder;
+            });
+        }
+
+        // --- CREAR NUEVO PRODUCTO DESDE EL ADMIN ---
+        function createNewProduct() {
+            const name = document.getElementById('new-prod-name').value.trim();
+            const price = parseFloat(document.getElementById('new-prod-price').value);
+            const days = parseInt(document.getElementById('new-prod-days').value) || 30;
+
+            if (!name || isNaN(price) || price <= 0) {
+                alert('Escribe un nombre válido y un precio mayor a 0.');
+                return;
+            }
+
+            const newId = 'prod-' + Math.random().toString(36.substring(2, 9));
+            let currentProducts = [...(globalProducts.length > 0 ? globalProducts : defaultProducts)];
+
+            currentProducts.push({
+                id: newId,
+                name: name,
+                price: price,
+                durationDays: days,
+                durationText: `Duración: ${days} días`,
+                image: ''
+            });
+
+            database.ref('store/products').set(currentProducts).then(() => {
+                alert('¡Nuevo producto creado y sincronizado con éxito!');
+                document.getElementById('new-prod-name').value = '';
+                document.getElementById('new-prod-price').value = '';
             });
         }
 
@@ -602,7 +649,6 @@
             }
         }
 
-        /* --- CAMBIO DE FONDO DE TIENDA EN FIREBASE --- */
         function updateStoreBackground() {
             const fileInput = document.getElementById('store-bg-file');
             if (fileInput.files && fileInput.files[0]) {
@@ -633,7 +679,6 @@
             });
         }
 
-        /* --- CARRITO DE COMPRAS --- */
         function addToCart(productId, productName, price, durationDays) {
             const stockData = globalStock;
             const prodStock = stockData[productId] ? Object.values(stockData[productId]) : [];
@@ -834,7 +879,6 @@
             });
         }
 
-        /* --- COPIAR CREDENCIALES DESDE CLIENTE --- */
         function copyAccountCredentials(elementId) {
             const credsElement = document.getElementById(elementId);
             if (credsElement) {
@@ -847,7 +891,6 @@
             }
         }
 
-        /* --- CONTADOR GLOBAL, HISTORIAL Y RECORDATORIOS --- */
         function loadGlobalSalesStats() {
             const clientsRef = database.ref('clients');
             clientsRef.on('value', (snapshot) => {
