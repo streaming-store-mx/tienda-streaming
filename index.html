@@ -133,7 +133,7 @@
             <!-- Catálogo de productos -->
             <div class="grid grid-cols-1 gap-6" id="products-grid"></div>
 
-            <!-- Panel Cliente: Mis Cuentas Compradas con Recordatorio de Vencimiento -->
+            <!-- Panel Cliente: Mis Cuentas Compradas -->
             <div class="bg-slate-900/60 backdrop-blur-lg rounded-2xl p-6 border border-purple-900/30 mt-8 space-y-4 shadow-xl">
                 <h3 class="text-lg font-bold flex items-center gap-2 text-pink-300">
                     <i class="fa-solid fa-tv"></i> Mis Cuentas Compradas y Vencimientos
@@ -361,6 +361,25 @@
             { id: 'iptv-1m', name: 'Servicio IPTV (1 Mes)', price: 150, durationDays: 30, image: '' }
         ];
 
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const regForm = document.getElementById('form-register');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnReg = document.getElementById('btn-tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
+                btnReg.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                loginForm.classList.add('hidden');
+                regForm.classList.remove('hidden');
+                btnReg.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
+                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            }
+        }
+
         function initRealtimeSync() {
             database.ref('store/products').on('value', (snapshot) => {
                 if (snapshot.exists()) {
@@ -500,10 +519,46 @@
         }
 
         function addToCart(id, name, price, days) {
+            const stockData = globalStock[id] ? Object.values(globalStock[id]) : [];
             const existing = cart.find(i => i.id === id);
-            if (existing) { existing.qty += 1; } else { cart.push({ id, name, price, durationDays: days, qty: 1 }); }
+            const currentQty = existing ? existing.qty : 0;
+
+            if (currentQty + 1 > stockData.length) {
+                alert('No hay más stock disponible para este producto.');
+                return;
+            }
+
+            if (existing) { 
+                existing.qty += 1; 
+            } else { 
+                cart.push({ id, name, price, durationDays: days, qty: 1 }); 
+            }
             updateCartUI();
             alert('Agregado al carrito');
+        }
+
+        // --- CONTADOR (-) Y (+) DENTRO DEL CARRITO ---
+        function changeCartQty(id, delta) {
+            const stockData = globalStock[id] ? Object.values(globalStock[id]) : [];
+            const item = cart.find(i => i.id === id);
+
+            if (item) {
+                if (delta > 0 && item.qty + 1 > stockData.length) {
+                    alert('No hay más stock disponible.');
+                    return;
+                }
+
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
         }
 
         function updateCartUI() {
@@ -525,8 +580,22 @@
             if (cart.length === 0) { container.innerHTML = '<p class="text-center text-slate-500">Carrito vacío</p>'; if(totalEl) totalEl.innerText = '$0.00 MXN'; return; }
             let total = 0;
             container.innerHTML = cart.map(item => {
-                total += item.price * item.qty;
-                return `<div class="bg-slate-950 p-3 rounded-xl flex justify-between items-center text-sm"><span>${item.name} (x${item.qty})</span><span class="text-emerald-400">$${item.price * item.qty}</span></div>`;
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                return `
+                    <div class="bg-slate-950 p-3.5 rounded-2xl border border-purple-900/40 flex items-center justify-between gap-3 text-sm">
+                        <div>
+                            <h4 class="font-bold text-white">${item.name}</h4>
+                            <p class="text-xs text-emerald-400 font-bold">$${item.price}.00 MXN c/u</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="changeCartQty('${item.id}', -1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow">-</button>
+                            <span class="font-mono text-pink-400 font-bold text-sm w-5 text-center">${item.qty}</span>
+                            <button onclick="changeCartQty('${item.id}', 1)" class="w-8 h-8 bg-slate-800 hover:bg-slate-700 text-white rounded-xl flex items-center justify-center font-bold text-sm shadow">+</button>
+                            <button onclick="removeFromCart('${item.id}')" class="text-red-400 hover:text-red-300 ml-2 p-1.5 text-xs" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             }).join('');
             if(totalEl) totalEl.innerText = `$${total.toFixed(2)} MXN`;
         }
@@ -535,7 +604,6 @@
         function openCartModal() { document.getElementById('cart-modal').classList.remove('hidden'); }
         function closeCartModal() { document.getElementById('cart-modal').classList.add('hidden'); }
 
-        // --- CORRECCIÓN DE DUPLICACIÓN EN COMPRA MÚLTIPLE ---
         function checkoutCart() {
             if (cart.length === 0) return;
             const currentID = localStorage.getItem('currentClientID');
@@ -563,7 +631,7 @@
                             }
 
                             for(let i = 0; i < item.qty; i++) {
-                                let keyToRemove = stockKeys.shift(); // Saca y remueve la llave exacta sin repetir
+                                let keyToRemove = stockKeys.shift();
                                 let creds = prodStockObj[keyToRemove];
                                 delete prodStockObj[keyToRemove];
 
@@ -695,7 +763,6 @@
             });
         }
 
-        // --- CORRECCIÓN DEL REINICIO DE CONTADOR ---
         function resetSalesStats() {
             if (confirm('¿Estás seguro de reiniciar los contadores? Esto eliminará el historial de compras de todos los clientes en Firebase.')) {
                 database.ref('clients').once('value').then((snapshot) => {
