@@ -894,4 +894,274 @@
 
         function addCreditByClientID() {
             const targetClientId = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
-            const amount = parseFloat(
+            const amount = parseFloat(document.getElementById('add-credit-amount').value);
+
+            if (!targetClientId || isNaN(amount) || amount <= 0) {
+                alert('Por favor ingresa un ID de cliente válido y un monto mayor a 0.');
+                return;
+            }
+
+            const clientBalanceRef = database.ref('clients/' + targetClientId + '/balance');
+
+            clientBalanceRef.transaction((currentBalance) => {
+                return (currentBalance || 0) + amount;
+            }, (error, committed) => {
+                if (error) {
+                    alert('Error al enviar saldo a Firebase: ' + error.message);
+                } else if (committed) {
+                    alert(`¡ÉXITO! Se agregaron $${amount.toFixed(2)} MXN al ID ${targetClientId} en Firebase.`);
+                    document.getElementById('add-credit-client-id').value = '';
+                    document.getElementById('add-credit-amount').value = '100';
+                }
+            });
+        }
+
+        function listenUserData(clientID) {
+            const clientRef = database.ref('clients/' + clientID);
+            const currentUsername = localStorage.getItem('currentUser') || 'Cliente';
+            
+            clientRef.on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                const balance = data.balance || 0;
+                document.getElementById('user-balance').innerText = `$${parseFloat(balance).toFixed(2)}`;
+
+                const purchasesList = document.getElementById('purchases-list');
+                if (data.purchases) {
+                    let html = '';
+                    Object.entries(data.purchases).forEach(([purchaseId, item]) => {
+                        const supportMsg = `Hola, soy ${currentUsername} (ID: ${clientID}). Tengo un problema con mi cuenta de ${item.productName} comprada el ${item.purchaseDate}. Las credenciales son: ${item.credentials}`;
+                        const encodedMsg = encodeURIComponent(supportMsg);
+
+                        html += `
+                            <tr class="hover:bg-purple-950/20 transition">
+                                <td class="p-3 font-bold text-white">${item.productName}</td>
+                                <td class="p-3 font-mono text-pink-400 select-all" id="creds-${purchaseId}">${item.credentials}</td>
+                                <td class="p-3 text-emerald-400 font-bold">$${item.price} MXN</td>
+                                <td class="p-3 text-slate-300 text-xs">${item.purchaseDate}</td>
+                                <td class="p-3 text-xs space-y-2">
+                                    <div class="text-amber-400 font-bold">${item.expireDate}</div>
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <button onclick="copyAccountCredentials('creds-${purchaseId}')" class="inline-flex items-center gap-1 bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
+                                            <i class="fa-solid fa-copy"></i> Copiar Cuenta
+                                        </button>
+                                        <a href="https://wa.me/529241955327?text=${encodedMsg}" target="_blank" class="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition shadow-md">
+                                            <i class="fa-brands fa-whatsapp"></i> Soporte
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    purchasesList.innerHTML = html;
+                } else {
+                    purchasesList.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No tienes cuentas compradas aún.</td></tr>`;
+                }
+            });
+        }
+
+        function addStock() {
+            const prodId = document.getElementById('stock-product-id').value;
+            const creds = document.getElementById('stock-credentials').value.trim();
+
+            if (!prodId || !creds) {
+                alert('Selecciona un producto y escribe las credenciales.');
+                return;
+            }
+
+            let stockData = getStock();
+            if (!stockData[prodId]) stockData[prodId] = [];
+            stockData[prodId].push(creds);
+
+            localStorage.setItem('storeStock', JSON.stringify(stockData));
+            document.getElementById('stock-credentials').value = '';
+            alert('¡Stock guardado correctamente!');
+            renderProducts();
+        }
+
+        function updateBankInfo() {
+            const name = document.getElementById('admin-bank-name').value;
+            const clabe = document.getElementById('admin-bank-clabe').value;
+            const holder = document.getElementById('admin-bank-holder').value;
+
+            if(name) localStorage.setItem('bankName', name);
+            if(clabe) localStorage.setItem('bankClabe', clabe);
+            if(holder) localStorage.setItem('bankHolder', holder);
+
+            loadBankInfo();
+            alert('Datos bancarios guardados con éxito.');
+        }
+
+        function loadBankInfo() {
+            const name = localStorage.getItem('bankName') || 'BBVA / Banco Azteca';
+            const clabe = localStorage.getItem('bankClabe') || '123456789012345678';
+            const holder = localStorage.getItem('bankHolder') || 'Administrador Streaming';
+
+            document.getElementById('bank-name-display').innerText = name;
+            document.getElementById('bank-clabe-display').innerText = clabe;
+            document.getElementById('bank-holder-display').innerText = holder;
+        }
+
+        function updateClientIDDisplays(clientId) {
+            ['user-client-id', 'user-id-banner', 'topup-user-id'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = clientId;
+            });
+
+            const waLink = document.getElementById('whatsapp-support-link');
+            if (waLink) {
+                waLink.href = `https://wa.me/529241955327?text=Hola,%20adjunto%20mi%20comprobante%20de%20pago.%20Mi%20ID%20de%20cliente%20es:%20${clientId}`;
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            if (!username) return;
+            
+            let clientId = localStorage.getItem(`clientID_${username}`);
+            if (!clientId) {
+                clientId = generateUniqueClientID();
+                localStorage.setItem(`clientID_${username}`, clientId);
+            }
+
+            localStorage.setItem('currentUser', username);
+            localStorage.setItem('currentClientID', clientId);
+
+            database.ref('clients/' + clientId).once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    database.ref('clients/' + clientId).set({
+                        username: username,
+                        balance: 0
+                    });
+                }
+            });
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            location.reload();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            if (!username) return;
+            
+            let clientId = localStorage.getItem(`clientID_${username}`);
+            if (!clientId) {
+                clientId = generateUniqueClientID();
+                localStorage.setItem(`clientID_${username}`, clientId);
+            }
+
+            localStorage.setItem('currentUser', username);
+            localStorage.setItem('currentClientID', clientId);
+
+            database.ref('clients/' + clientId).set({
+                username: username,
+                balance: 0
+            });
+
+            document.getElementById('auth-screen').classList.add('hidden');
+            location.reload();
+        }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('form-login');
+            const registerForm = document.getElementById('form-register');
+            const btnLogin = document.getElementById('btn-tab-login');
+            const btnRegister = document.getElementById('btn-tab-register');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                btnLogin.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-purple-600 text-white transition shadow-lg";
+                btnRegister.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                btnRegister.className = "flex-1 py-2.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white transition shadow-lg";
+                btnLogin.className = "flex-1 py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentClientID');
+            location.reload();
+        }
+
+        function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+        function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+        function verifyAdminPIN() {
+            const pin = document.getElementById('admin-pin-input').value;
+            if (pin.length > 0) {
+                closeAdminModal();
+                document.getElementById('tab-shop').classList.add('hidden');
+                document.getElementById('tab-admin').classList.remove('hidden');
+            } else {
+                alert('PIN Incorrecto');
+            }
+        }
+
+        function switchTab(tab) {
+            if (tab === 'shop') {
+                document.getElementById('tab-admin').classList.add('hidden');
+                document.getElementById('tab-shop').classList.remove('hidden');
+            }
+        }
+
+        function openTopUpModal() { document.getElementById('topup-modal').classList.remove('hidden'); }
+        function closeTopUpModal() { document.getElementById('topup-modal').classList.add('hidden'); }
+
+        function copyClientID() {
+            const clientID = localStorage.getItem('currentClientID') || 'CLI-0000';
+            navigator.clipboard.writeText(clientID);
+            alert(`ID copiado al portapapeles: ${clientID}`);
+        }
+
+        function updateProductPrice() {
+            const prodId = document.getElementById('price-product-id').value;
+            const newPrice = parseFloat(document.getElementById('new-product-price').value);
+
+            if (!prodId || isNaN(newPrice) || newPrice <= 0) {
+                alert('Ingresa un precio válido.');
+                return;
+            }
+
+            let currentProducts = getProducts();
+            const prodIndex = currentProducts.findIndex(p => p.id === prodId);
+            if (prodIndex !== -1) {
+                currentProducts[prodIndex].price = newPrice;
+                localStorage.setItem('storeProducts', JSON.stringify(currentProducts));
+                renderProducts();
+                alert('Precio actualizado correctamente.');
+                document.getElementById('new-product-price').value = '';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedBg = localStorage.getItem('storeCustomBg');
+            if (savedBg) {
+                applyStoreBackground(savedBg);
+            }
+
+            const user = localStorage.getItem('currentUser');
+            let clientID = localStorage.getItem('currentClientID');
+
+            if (user && clientID) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                const userEl = document.getElementById('welcome-username');
+                if (userEl) userEl.innerText = user;
+
+                updateClientIDDisplays(clientID);
+                listenUserData(clientID);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+            }
+
+            renderProducts();
+            loadBankInfo();
+            loadGlobalSalesStats();
+        });
+    </script>
+</body>
+</html>
