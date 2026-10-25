@@ -408,7 +408,7 @@
                             ${hasStock ? `<span class="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-bold">Disponible (${prodStock.length})</span>` : `<span class="bg-red-500/20 text-red-400 text-xs px-3 py-1 rounded-full font-bold">Agotado</span>`}
                         </div>
                         <div class="h-36 bg-cover bg-center flex items-center justify-center relative border-b border-purple-900/20" style="${imgStyle}">
-                            {!p.image ? `<h3 class="text-xl font-black text-red-500">${p.name}</h3>` : ''}
+                            ${!p.image ? `<h3 class="text-xl font-black text-red-500">${p.name}</h3>` : ''}
                         </div>
                         <div class="p-6 space-y-4">
                             <h3 class="text-lg font-bold text-white">${p.name}</h3>
@@ -423,6 +423,62 @@
                 const sel = document.getElementById(id);
                 if (sel) sel.innerHTML = currentProducts.map(prod => `<option value="${prod.id}">${prod.name} ($${prod.price})</option>`).join('');
             });
+        }
+
+        function loadProductDetailsToForm() {
+            const selectEl = document.getElementById('image-product-id');
+            if (!selectEl) return;
+            const prodId = selectEl.value;
+            const currentProducts = globalProducts.length > 0 ? globalProducts : defaultProducts;
+            const p = currentProducts.find(item => item.id === prodId);
+            if (p) {
+                const nameInput = document.getElementById('edit-product-name');
+                if (nameInput) nameInput.value = p.name;
+            }
+        }
+
+        function updateProductVisuals() {
+            const prodId = document.getElementById('image-product-id').value;
+            const newName = document.getElementById('edit-product-name').value.trim();
+            const fileInput = document.getElementById('edit-product-file');
+
+            let currentProducts = [...(globalProducts.length > 0 ? globalProducts : defaultProducts)];
+            const index = currentProducts.findIndex(p => p.id === prodId);
+
+            if (index !== -1) {
+                if (newName) currentProducts[index].name = newName;
+
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        currentProducts[index].image = e.target.result;
+                        database.ref('store/products').set(currentProducts).then(() => {
+                            alert('¡Imagen y nombre actualizados!');
+                        });
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    database.ref('store/products').set(currentProducts).then(() => {
+                        alert('¡Nombre actualizado!');
+                    });
+                }
+            }
+        }
+
+        function updateProductPrice() {
+            const prodId = document.getElementById('price-product-id').value;
+            const newPrice = parseFloat(document.getElementById('new-product-price').value);
+            if (!prodId || isNaN(newPrice)) return;
+
+            let currentProducts = [...(globalProducts.length > 0 ? globalProducts : defaultProducts)];
+            const index = currentProducts.findIndex(p => p.id === prodId);
+            if (index !== -1) {
+                currentProducts[index].price = newPrice;
+                database.ref('store/products').set(currentProducts).then(() => {
+                    alert('¡Precio actualizado!');
+                    document.getElementById('new-product-price').value = '';
+                });
+            }
         }
 
         function addToCart(id, name, price, days) {
@@ -536,6 +592,23 @@
             const creds = document.getElementById('stock-credentials').value.trim();
             if(!prodId || !creds) return;
             database.ref('store/stock/' + prodId).push(creds).then(() => { document.getElementById('stock-credentials').value = ''; alert('Stock guardado'); });
+        }
+
+        function updateBankInfo() {
+            const name = document.getElementById('admin-bank-name').value;
+            const clabe = document.getElementById('admin-bank-clabe').value;
+            const holder = document.getElementById('admin-bank-holder').value;
+            database.ref('store/bankInfo').set({ name, clabe, holder }).then(() => alert('Banco actualizado'));
+        }
+
+        function addCreditByClientID() {
+            const id = document.getElementById('add-credit-client-id').value.trim().toUpperCase();
+            const amount = parseFloat(document.getElementById('add-credit-amount').value);
+            if(!id || isNaN(amount)) return;
+            database.ref('clients/' + id + '/balance').transaction(b => (b || 0) + amount, () => {
+                alert('Crédito añadido con éxito');
+                document.getElementById('add-credit-client-id').value = '';
+            });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
