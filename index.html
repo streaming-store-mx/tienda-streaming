@@ -537,7 +537,6 @@
             alert('Agregado al carrito');
         }
 
-        // --- CONTADOR (-) Y (+) DENTRO DEL CARRITO ---
         function changeCartQty(id, delta) {
             const stockData = globalStock[id] ? Object.values(globalStock[id]) : [];
             const item = cart.find(i => i.id === id);
@@ -683,9 +682,20 @@
             location.reload();
         }
 
+        // --- CORRECCIÓN DEL REGISTRO DE CLIENTES ---
         function handleRegister(e) {
             e.preventDefault();
-            handleLogin(e);
+            const user = document.getElementById('reg-username').value.trim();
+            if(!user) return;
+            let clientId = localStorage.getItem(`clientID_${user}`) || 'CLI-' + Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem(`clientID_${user}`, clientId);
+            localStorage.setItem('currentUser', user);
+            localStorage.setItem('currentClientID', clientId);
+
+            database.ref('clients/' + clientId).once('value').then(snap => {
+                if(!snap.exists()) database.ref('clients/' + clientId).set({ username: user, balance: 0 });
+            });
+            location.reload();
         }
 
         function logout() { localStorage.removeItem('currentUser'); localStorage.removeItem('currentClientID'); location.reload(); }
